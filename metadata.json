@@ -1,0 +1,7 @@
+{
+  "name": "Vive Tu Hogar - Casas Prefabricadas",
+  "description": "Diseñamos tu casa, construimos tus sueños. Casas prefabricadas modernas, eficientes y resistentes en Colombia. Entrega desde 30 días.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
