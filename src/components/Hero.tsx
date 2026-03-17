@@ -29,7 +29,7 @@ const Hero = ({ handleWhatsApp, scrollTo }: HeroProps) => {
             <div className="h-[1px] w-8 bg-brand"></div>
             <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand">Bogotá, Colombia — Est. 2020</span>
           </div>
-          <h1 className="text-6xl md:text-8xl font-black leading-[0.9] tracking-tighter uppercase mb-8">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[0.9] tracking-tighter uppercase mb-8">
             Construye <br />
             <span className="text-brand">Tu Hogar</span> <br />
             En 30 Días.
