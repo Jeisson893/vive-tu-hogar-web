@@ -27,7 +27,7 @@ const Hero = ({ handleWhatsApp, scrollTo }: HeroProps) => {
         >
           <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 mb-6">
             <div className="h-[1px] w-8 bg-brand"></div>
-            <span className="text-xs md:text-sm tracking-widest text-gold/80 font-bold uppercase">Bogotá, Colombia — Est. 2020</span>
+            <span className="text-xs md:text-sm tracking-widest text-gold/80 font-bold uppercase mt-12 md:mt-6 lg:mt-4">Bogotá, Colombia — Est. 2020</span>
           </div>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[0.9] tracking-tighter uppercase mb-8">
             Construye <br />
