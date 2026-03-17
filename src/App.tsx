@@ -514,16 +514,13 @@ const models = [
       {/* Navigation */}
       <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-dark/90 backdrop-blur-md py-4 border-b border-white/10' : 'bg-transparent py-6'}`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center h-24 md:h-28">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => scrollTo('inicio')}>
-            <img
-              src={ASSETS.logo}
-              alt="Vive Tu Hogar"
-              className="h-12 w-auto"
-              referrerPolicy="no-referrer"
-            />
-            <div className="flex flex-col leading-tight">
-              <span className="text-white font-bold text-lg">VIVE TU HOGAR</span>
-              <span className="text-yellow-400 text-xs tracking-wider">CASAS PREFABRICADAS</span>
+          <div className="flex items-center gap-4 cursor-pointer" onClick={() => scrollTo('inicio')}>
+            <div className="flex items-center justify-center h-24 md:h-28">
+              <img src={ASSETS.logo} alt="Logo Vive Tu Hogar" className="h-20 md:h-24 lg:h-28 w-auto object-contain" referrerPolicy="no-referrer" />
+            </div>
+            <div className="leading-none">
+              <span className="block text-base font-black tracking-tighter uppercase text-white">Vive Tu Hogar</span>
+              <span className="block text-[10px] font-bold text-brand uppercase tracking-widest">Casas Prefabricadas</span>
             </div>
           </div>
 
