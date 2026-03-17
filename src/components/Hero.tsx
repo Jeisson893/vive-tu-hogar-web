@@ -8,7 +8,7 @@ type HeroProps = {
 
 const Hero = ({ handleWhatsApp, scrollTo }: HeroProps) => {
   return (
-    <section id="inicio" className="relative min-h-screen flex items-center mt-6 md:mt-0 lg:mt-0 pt-16 md:pt-24 lg:pt-32 overflow-hidden">
+    <section id="inicio" className="relative min-h-[70vh] md:min-h-screen flex items-center mt-6 md:mt-0 lg:mt-0 pt-16 md:pt-24 lg:pt-32 overflow-hidden">
       <div className="absolute inset-0 z-0">
         <img 
           src="https://picsum.photos/seed/house-modern/1920/1080" 
