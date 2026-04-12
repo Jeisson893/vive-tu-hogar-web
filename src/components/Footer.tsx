@@ -23,7 +23,7 @@ const Footer = ({ scrollTo }: FooterProps) => {
             Diseñamos tu casa, construimos tus sueños. Líderes en construcción prefabricada de alta calidad en Colombia.
           </p>
           <div className="flex gap-4">
-            <a href="#" className="w-10 h-10 border border-white/10 flex items-center justify-center rounded-full hover:bg-brand hover:text-dark transition-all"><Instagram size={18} /></a>
+            <a href="https://www.instagram.com/click_casas?igsh=MXJlc3c4NmNoM2Y3eA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center rounded-full hover:bg-brand hover:text-dark transition-all"><Instagram size={18} /></a>
             <a href="#" className="w-10 h-10 border border-white/10 flex items-center justify-center rounded-full hover:bg-brand hover:text-dark transition-all"><Facebook size={18} /></a>
             <a href="https://www.tiktok.com/@clickcasas?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center rounded-full hover:bg-brand hover:text-dark transition-all">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

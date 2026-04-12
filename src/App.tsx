@@ -18,8 +18,6 @@ import Hero from './components/Hero';
 import Catalogo from './components/Catalogo';
 import Footer from './components/Footer';
 
-const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwMhXAgo9e4iJehJitW8GImfnHmhCch2V0rM5p3Wy44Oj0Jyx6ZH7bv1tVrEUeJj09k/exec";
-
 const AutomaticQuoter = ({ handleWhatsApp }: { handleWhatsApp: (msg?: string) => void }) => {
   const SIZE_OPTIONS = [36, 42, 48, 54, 63, 72, 100];
   const [sizeIndex, setSizeIndex] = useState(0);
@@ -28,12 +26,6 @@ const AutomaticQuoter = ({ handleWhatsApp }: { handleWhatsApp: (msg?: string) =>
   const [rooms, setRooms] = useState(2);
   const [bathrooms, setBathrooms] = useState(1);
   const [material, setMaterial] = useState('concreto');
-  const [extras, setExtras] = useState({
-    terraza: false,
-    garaje: false,
-    acabados: false,
-    cocina: false
-  });
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -72,12 +64,6 @@ const AutomaticQuoter = ({ handleWhatsApp }: { handleWhatsApp: (msg?: string) =>
   const materialMultiplier = material === 'acero' ? 1.08 : 1;
   const baseWithMultipliers = basePrice * floorMultiplier * materialMultiplier;
   const bathroomsExtra = Math.max(0, bathrooms - 1) * 3000000;
-  const extrasPrice = 
-    (extras.terraza ? 2500000 : 0) +
-    (extras.garaje ? 3500000 : 0) +
-    (extras.acabados ? 5000000 : 0) +
-    (extras.cocina ? 2000000 : 0);
-  
   const totalPrice = baseWithMultipliers + bathroomsExtra;
 
   const formatPrice = (price: number) => {
@@ -131,7 +117,6 @@ Estoy interesado en recibir más información.`;
   const saveQuote = async () => {
     try {
       const payload = {
-        token: "vive-tu-hogar-2026",
         name: sanitize(formData.name),
         whatsapp: sanitize(formData.phone),
         email: sanitize(formData.email),
@@ -143,11 +128,9 @@ Estoy interesado en recibir más información.`;
         material,
         price: totalPrice
       };
-      await fetch(WEBHOOK_URL, {
+      await fetch("/api/cotizar", {
         method: "POST",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
       return true;
@@ -169,12 +152,6 @@ Estoy interesado en recibir más información.`;
     setRooms(2);
     setBathrooms(1);
     setMaterial('concreto');
-    setExtras({
-      terraza: false,
-      garaje: false,
-      acabados: false,
-      cocina: false
-    });
   };
 
   const handleSend = async (e: React.FormEvent) => {
@@ -314,34 +291,6 @@ Estoy interesado en recibir más información.`;
               </div>
             </div>
 
-            {/* Extras */}
-            <div className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Extras Opcionales</label>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {[
-                  { id: 'terraza', label: 'Terraza', price: 2500000 },
-                  { id: 'garaje', label: 'Garaje', price: 3500000 },
-                  { id: 'acabados', label: 'Acabados Premium', price: 5000000 },
-                  { id: 'cocina', label: 'Cocina Integral', price: 2000000 }
-                ].map(extra => (
-                  <button 
-                    key={extra.id}
-                    onClick={() => setExtras(prev => ({ ...prev, [extra.id]: !prev[extra.id as keyof typeof prev] }))}
-                    className={`p-4 rounded-xl border flex items-center justify-between transition-all ${extras[extra.id as keyof typeof extras] ? 'bg-brand/10 border-brand' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${extras[extra.id as keyof typeof extras] ? 'bg-brand border-brand' : 'border-white/20'}`}>
-                        {extras[extra.id as keyof typeof extras] && <CheckCircle2 size={12} className="text-dark" />}
-                      </div>
-                      <div className="text-left">
-                        <span className={`block text-xs font-black uppercase tracking-widest ${extras[extra.id as keyof typeof extras] ? 'text-brand' : 'text-white'}`}>{extra.label}</span>
-                        <span className="text-[10px] text-slate-500 font-bold">+{formatPrice(extra.price)}</span>
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
 
           {/* Result & Form */}
@@ -374,12 +323,6 @@ Estoy interesado en recibir más información.`;
                     <span>Base ({meters} m²)</span>
                     <span>{formatPrice(basePrice)}</span>
                   </div>
-                  {Object.entries(extras).some(([_, v]) => v) && (
-                    <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
-                      <span>Extras Seleccionados</span>
-                      <span>{formatPrice(extrasPrice)}</span>
-                    </div>
-                  )}
                   <div className="pt-4 flex flex-col gap-2">
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Precio Total Estimado</span>
                     <span className="text-5xl md:text-6xl font-black text-brand tracking-tighter">{formatPrice(totalPrice)}</span>
@@ -798,6 +741,56 @@ const models = [
         setActiveFilter={setActiveFilter}
         scrollTo={scrollTo}
       />
+
+      {/* Obsequio Especial */}
+      <section className="py-24 px-6 bg-white text-dark">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+          <div className="order-2 lg:order-1">
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-brand block mb-4">Bono Especial</span>
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">
+              Tu nuevo hogar con un <span className="text-brand">obsequio especial</span>
+            </h2>
+            <p className="text-slate-600 text-sm md:text-base leading-relaxed mb-8 max-w-xl">
+              Al adquirir tu vivienda prefabricada con Vive Tu Hogar, recibe un kit de baño completo de cortesía para que empieces
+              a disfrutar tu nuevo espacio desde el primer día.
+            </p>
+            <ul className="grid sm:grid-cols-2 gap-4 text-xs font-bold uppercase tracking-widest text-slate-500 mb-10">
+              <li className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-brand rounded-full"></span>
+                Sanitario
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-brand rounded-full"></span>
+                Lavamanos
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-brand rounded-full"></span>
+                Grifería
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-brand rounded-full"></span>
+                Accesorios incluidos
+              </li>
+            </ul>
+            <button
+              onClick={() => scrollTo('cotizador-seccion')}
+              className="bg-brand text-dark px-10 py-4 rounded-sm font-black uppercase tracking-widest text-xs hover:bg-dark hover:text-white transition-colors"
+            >
+              Quiero cotizar mi casa
+            </button>
+          </div>
+          <div className="order-1 lg:order-2">
+            <div className="relative overflow-hidden rounded-3xl border border-black/10 shadow-2xl bg-white">
+              <img
+                src="/images/baño-obsequio.webp"
+                alt="Kit de baño obsequio"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 ring-1 ring-black/5"></div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Materiales Disponibles */}
       <section className="py-24 bg-[#141414] text-white">

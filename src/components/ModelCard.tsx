@@ -37,8 +37,8 @@ const ModelCard: React.FC<ModelCardProps> = ({ model, onQuote }) => {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           referrerPolicy="no-referrer"
           onError={(e) => {
-            // Fallback if Imgur link fails
-            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&q=80&w=800';
+            // Fallback to local asset to avoid external dependency
+            (e.target as HTMLImageElement).src = '/images/modelos/casa65m2.webp';
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
