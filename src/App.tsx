@@ -743,7 +743,7 @@ const models = [
       />
 
       {/* Obsequio Especial */}
-      <section className="py-24 px-6 bg-white text-dark">
+      <section className="py-24 px-6 bg-gradient-to-br from-[#f7f3ee] via-[#f2eee8] to-[#ece7e0] text-dark">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
           <div className="order-2 lg:order-1">
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-brand block mb-4">Bono Especial</span>
@@ -780,13 +780,14 @@ const models = [
             </button>
           </div>
           <div className="order-1 lg:order-2">
-            <div className="relative overflow-hidden rounded-3xl border border-black/10 shadow-2xl bg-white">
+            <div className="relative overflow-hidden rounded-3xl border border-black/10 shadow-[0_20px_50px_rgba(0,0,0,0.12)] bg-[#ded7cc] p-3">
               <img
                 src="/images/baño-obsequio.webp"
                 alt="Kit de baño obsequio"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover rounded-2xl"
               />
               <div className="absolute inset-0 ring-1 ring-black/5"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-black/0 via-black/0 to-black/5 pointer-events-none"></div>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-﻿import { ArrowRight, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { motion } from 'motion/react';
 import { ASSETS } from '../assets';
 
@@ -28,12 +28,12 @@ const Hero = ({ handleWhatsApp, scrollTo }: HeroProps) => {
         >
           <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 mb-6">
             <div className="h-[1px] w-8 bg-brand"></div>
-            <span className="text-xs md:text-sm tracking-widest text-gold/80 font-bold uppercase mt-12 md:mt-6 lg:mt-4">BogotÃ¡, Colombia â€” Est. 2020</span>
+            <span className="text-xs md:text-sm tracking-widest text-gold/80 font-bold uppercase mt-12 md:mt-6 lg:mt-4">Bogotá, Colombia — Est. 2020</span>
           </div>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[0.9] tracking-tighter uppercase mb-8">
             Construye <br />
             <span className="text-brand">Tu Hogar</span> <br />
-            En 30 DÃ­as.
+            En 30 Días.
           </h1>
           <p className="text-slate-400 max-w-md text-lg mb-10 leading-relaxed">
             Casas prefabricadas modernas, eficientes y sismo-resistentes (NSR-10), adaptadas al clima y estilo de vida colombiano. Desde $12.600.000 COP.
@@ -51,12 +51,12 @@ const Hero = ({ handleWhatsApp, scrollTo }: HeroProps) => {
               onClick={() => scrollTo('modelos-destacados')}
               className="border border-white/20 text-white px-8 py-4 rounded-sm font-black uppercase tracking-widest hover:bg-white hover:text-dark transition-colors"
             >
-              Ver CatÃ¡logo
+              Ver Catálogo
             </button>
           </div>
           <div className="mt-12 flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">
             <ShieldCheck size={14} className="text-brand" />
-            Certificado NSR-10 / Ley 400/2010 â€¢ Sistema Probado +30 aÃ±os en Colombia
+            Certificado NSR-10 / Ley 400/2010 • Sistema Probado +30 años en Colombia
           </div>
         </motion.div>
 
@@ -69,7 +69,7 @@ const Hero = ({ handleWhatsApp, scrollTo }: HeroProps) => {
           >
             {/* Floating Cards */}
             <div className="absolute top-10 right-0 bg-card/80 backdrop-blur-md p-6 border border-white/10 rounded-sm z-20 shadow-2xl">
-              <div className="text-brand font-black text-2xl mb-1">30 dÃ­as</div>
+              <div className="text-brand font-black text-2xl mb-1">30 días</div>
               <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Tiempo de entrega</div>
             </div>
             <div className="absolute bottom-20 -left-10 bg-card/80 backdrop-blur-md p-6 border border-white/10 rounded-sm z-20 shadow-2xl">

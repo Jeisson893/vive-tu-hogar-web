@@ -1,4 +1,4 @@
-﻿export interface HouseModel {
+export interface HouseModel {
   id: string;
   name: string;
   area: number;
@@ -19,7 +19,7 @@ export const HOUSE_MODELS: HouseModel[] = [
     bedrooms: 2,
     bathrooms: 1,
     price: 12600000,
-    description: "Ideal para parejas o inversiÃ³n en zonas rurales.",
+    description: "Ideal para parejas o inversión en zonas rurales.",
     image: "/images/modelos/casa42m2.webp"
   },
   {
@@ -30,7 +30,7 @@ export const HOUSE_MODELS: HouseModel[] = [
     bedrooms: 2,
     bathrooms: 1,
     price: 14700000,
-    description: "Espacios optimizados con diseÃ±o moderno.",
+    description: "Espacios optimizados con diseño moderno.",
     image: "/images/modelos/casa42m2.webp"
   },
   {
@@ -41,7 +41,7 @@ export const HOUSE_MODELS: HouseModel[] = [
     bedrooms: 3,
     bathrooms: 1,
     price: 16800000,
-    description: "Perfecta para familias pequeÃ±as que buscan comodidad.",
+    description: "Perfecta para familias pequeñas que buscan comodidad.",
     image: "/images/modelos/casa65m2.webp"
   },
   {
@@ -52,7 +52,7 @@ export const HOUSE_MODELS: HouseModel[] = [
     bedrooms: 3,
     bathrooms: 2,
     price: 18900000,
-    description: "DistribuciÃ³n inteligente con dos baÃ±os completos.",
+    description: "Distribución inteligente con dos baños completos.",
     image: "/images/modelos/casa65m2.webp"
   },
   {
@@ -63,7 +63,7 @@ export const HOUSE_MODELS: HouseModel[] = [
     bedrooms: 3,
     bathrooms: 2,
     price: 22000000,
-    description: "Nuestra casa mÃ¡s vendida por su equilibrio y diseÃ±o.",
+    description: "Nuestra casa más vendida por su equilibrio y diseño.",
     image: "/images/modelos/casa65m2.webp"
   },
   {
@@ -79,13 +79,13 @@ export const HOUSE_MODELS: HouseModel[] = [
   },
   {
     id: "m100",
-    name: "Modelo MansiÃ³n 100",
+    name: "Modelo Mansión 100",
     area: 100,
     dimensions: "10x10",
     bedrooms: 4,
     bathrooms: 3,
     price: 35000000,
-    description: "El mÃ¡ximo exponente de lujo y espacio prefabricado.",
+    description: "El máximo exponente de lujo y espacio prefabricado.",
     image: "/images/modelos/casa100m2.webp"
   }
 ];
