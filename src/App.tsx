@@ -59,10 +59,13 @@ const AutomaticQuoter = ({ handleWhatsApp }: { handleWhatsApp: (msg?: string) =>
     72: 25200000,
     100: 35000000
   };
-  const basePrice = basePrices[meters] ?? 0;
-  const floorMultiplier = floors === 2 ? 1.35 : 1;
+  // Casa 2 pisos agrega 35% sobre el precio base del brochure.
+  const TWO_FLOORS_MULTIPLIER = 1.35;
+  const basePrice = floors === 2
+    ? (basePrices[meters] ?? 0) * TWO_FLOORS_MULTIPLIER
+    : basePrices[meters] ?? 0;
   const materialMultiplier = material === 'acero' ? 1.08 : 1;
-  const baseWithMultipliers = basePrice * floorMultiplier * materialMultiplier;
+  const baseWithMultipliers = basePrice * materialMultiplier;
   const bathroomsExtra = Math.max(0, bathrooms - 1) * 3000000;
   const totalPrice = baseWithMultipliers + bathroomsExtra;
 
@@ -409,7 +412,7 @@ const App = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const WHATSAPP_NUMBER = '3144366748';
+  const WHATSAPP_NUMBER = '3027472987';
   const DEFAULT_MESSAGE = "Hola, estoy interesado en una casa prefabricada. ¿Podrían darme información?";
 
   const getWhatsAppUrl = (message?: string) => {
