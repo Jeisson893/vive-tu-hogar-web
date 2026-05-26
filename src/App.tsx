@@ -25,6 +25,7 @@ const AutomaticQuoter = ({ handleWhatsApp }: { handleWhatsApp: (msg?: string) =>
   const [floors, setFloors] = useState(1);
   const [rooms, setRooms] = useState(2);
   const [bathrooms, setBathrooms] = useState(1);
+  const [firstFloorBathrooms, setFirstFloorBathrooms] = useState(1);
   const [material, setMaterial] = useState('concreto');
   const [formData, setFormData] = useState({
     name: '',
@@ -43,6 +44,8 @@ const AutomaticQuoter = ({ handleWhatsApp }: { handleWhatsApp: (msg?: string) =>
     100: [4]
   };
   const allowedRooms = allowedRoomsBySize[meters] ?? [2];
+  const maxBathrooms = meters <= 42 ? 3 : 4;
+  const bathroomOptions = Array.from({ length: maxBathrooms }, (_, index) => index + 1);
 
   useEffect(() => {
     if (!allowedRooms.includes(rooms)) {
@@ -50,24 +53,31 @@ const AutomaticQuoter = ({ handleWhatsApp }: { handleWhatsApp: (msg?: string) =>
     }
   }, [meters, rooms, allowedRooms]);
 
-  const basePrices: Record<number, number> = {
-    36: 12600000,
-    42: 14700000,
-    48: 16800000,
-    54: 18900000,
-    63: 22000000,
-    72: 25200000,
-    100: 35000000
-  };
-  // Casa 2 pisos agrega 35% sobre el precio base del brochure.
-  const TWO_FLOORS_MULTIPLIER = 1.35;
-  const basePrice = floors === 2
-    ? (basePrices[meters] ?? 0) * TWO_FLOORS_MULTIPLIER
-    : basePrices[meters] ?? 0;
-  const materialMultiplier = material === 'acero' ? 1.08 : 1;
-  const baseWithMultipliers = basePrice * materialMultiplier;
-  const bathroomsExtra = Math.max(0, bathrooms - 1) * 3000000;
-  const totalPrice = baseWithMultipliers + bathroomsExtra;
+  useEffect(() => {
+    if (bathrooms > maxBathrooms) {
+      setBathrooms(maxBathrooms);
+    }
+  }, [bathrooms, maxBathrooms]);
+
+  useEffect(() => {
+    const maxFirstFloorBathrooms = Math.max(1, bathrooms - 1);
+    if (floors === 2 && firstFloorBathrooms > maxFirstFloorBathrooms) {
+      setFirstFloorBathrooms(maxFirstFloorBathrooms);
+    }
+  }, [bathrooms, floors, firstFloorBathrooms]);
+
+  const firstFloorRate = material === 'acero' ? 450000 : 350000;
+  const secondFloorRate = 550000;
+  const basePrice = meters * (floors === 2 ? firstFloorRate + secondFloorRate : firstFloorRate);
+  const includedBathrooms = floors === 2 ? 2 : 1;
+  const bathroomsExtra = Math.max(0, bathrooms - includedBathrooms) * 3000000;
+  const totalPrice = basePrice + bathroomsExtra;
+  const firstFloorRooms = rooms;
+  const secondFloorRooms = floors === 2 ? rooms : 0;
+  const distributedFirstFloorBathrooms = floors === 2
+    ? (bathrooms > 2 ? firstFloorBathrooms : Math.min(1, bathrooms))
+    : bathrooms;
+  const distributedSecondFloorBathrooms = floors === 2 ? bathrooms - distributedFirstFloorBathrooms : 0;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(price);
@@ -131,11 +141,16 @@ Estoy interesado en recibir más información.`;
         material,
         price: totalPrice
       };
-      await fetch("/api/cotizar", {
+      const response = await fetch("/api/cotizar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error guardando cotización", response.status, errorText);
+        return false;
+      }
       return true;
     } catch (error) {
       console.error("Error guardando cotización", error);
@@ -154,6 +169,7 @@ Estoy interesado en recibir más información.`;
     setFloors(1);
     setRooms(2);
     setBathrooms(1);
+    setFirstFloorBathrooms(1);
     setMaterial('concreto');
   };
 
@@ -168,10 +184,13 @@ Estoy interesado en recibir más información.`;
       alert('Por favor completa Nombre, WhatsApp, Correo y Ciudad.');
       return;
     }
-    const saved = await saveQuote();
-    if (!saved) return;
     const message = buildWhatsAppMessage();
     handleWhatsApp(message);
+    void saveQuote().then((saved) => {
+      if (!saved) {
+        console.error("La cotización no pudo registrarse en el webhook.");
+      }
+    });
     resetQuote();
   };
 
@@ -223,6 +242,9 @@ Estoy interesado en recibir más información.`;
                       key={n}
                       onClick={() => {
                         setFloors(n);
+                        if (n === 2 && bathrooms < 2) {
+                          setBathrooms(2);
+                        }
                       }}
                       className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${floors === n ? 'bg-brand text-dark' : 'bg-white/5 text-slate-400 hover:bg-white/10'}`}
                     >
@@ -257,7 +279,7 @@ Estoy interesado en recibir más información.`;
             <div className="space-y-4">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Baños</label>
               <div className="flex gap-2">
-                {[1, 2, 3].map((n) => (
+                {bathroomOptions.map((n) => (
                   <button 
                     key={n}
                     onClick={() => {
@@ -274,6 +296,9 @@ Estoy interesado en recibir más información.`;
             {/* Material */}
             <div className="space-y-4">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Material de Estructura</label>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Cotiza el valor en el material de estructura de tu preferencia
+              </p>
               <div className="grid sm:grid-cols-2 gap-4">
                 <button 
                   onClick={() => setMaterial('concreto')}
@@ -288,8 +313,8 @@ Estoy interesado en recibir más información.`;
                   className={`p-6 rounded-2xl border text-left transition-all ${material === 'acero' ? 'bg-brand/10 border-brand' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}
                 >
                   <Zap size={24} className={`mb-4 ${material === 'acero' ? 'text-brand' : 'text-slate-500'}`} />
-                  <span className={`block font-black uppercase tracking-widest text-xs mb-1 ${material === 'acero' ? 'text-brand' : 'text-white'}`}>Acero Galvanizado</span>
-                  <span className="text-[10px] text-slate-500 uppercase tracking-widest leading-relaxed">Perfiles cal. 22. Resistente a corrosión. Estructura liviana.</span>
+                  <span className={`block font-black uppercase tracking-widest text-xs mb-1 ${material === 'acero' ? 'text-brand' : 'text-white'}`}>Bloquelón</span>
+                  <span className="text-[10px] text-slate-500 uppercase tracking-widest leading-relaxed">Sistema en bloquelón de alta resistencia, mayor aislamiento térmico y excelente durabilidad estructural.</span>
                 </button>
               </div>
             </div>
@@ -322,6 +347,88 @@ Estoy interesado en recibir más información.`;
                 </div>
 
                 <div className="pt-8 border-t border-white/10 space-y-4">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block">Distribución estimada</span>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
+                      <span className="text-brand font-black uppercase tracking-widest text-[10px] block">Piso 1</span>
+                      <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
+                        <span>Habitaciones</span>
+                        <span>{firstFloorRooms}</span>
+                      </div>
+                      <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
+                        <span>Baños</span>
+                        <span>{distributedFirstFloorBathrooms}</span>
+                      </div>
+                    </div>
+                    {floors === 2 && (
+                      <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
+                        <span className="text-brand font-black uppercase tracking-widest text-[10px] block">Piso 2</span>
+                        <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
+                          <span>Habitaciones</span>
+                          <span>{secondFloorRooms}</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
+                          <span>Baños</span>
+                          <span>{distributedSecondFloorBathrooms}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {floors === 2 && bathrooms > 2 && (
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block">Distribuir baños</span>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Piso 1</span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setFirstFloorBathrooms((value) => Math.max(1, value - 1))}
+                              disabled={distributedFirstFloorBathrooms <= 1}
+                              className="w-9 h-9 rounded-xl bg-white/5 text-slate-400 font-black disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 transition-all"
+                            >
+                              -
+                            </button>
+                            <span className="flex-1 text-center text-xl font-black">{distributedFirstFloorBathrooms}</span>
+                            <button
+                              type="button"
+                              onClick={() => setFirstFloorBathrooms((value) => Math.min(bathrooms - 1, value + 1))}
+                              disabled={distributedFirstFloorBathrooms >= bathrooms - 1}
+                              className="w-9 h-9 rounded-xl bg-white/5 text-slate-400 font-black disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 transition-all"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Piso 2</span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setFirstFloorBathrooms((value) => Math.min(bathrooms - 1, value + 1))}
+                              disabled={distributedSecondFloorBathrooms <= 1}
+                              className="w-9 h-9 rounded-xl bg-white/5 text-slate-400 font-black disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 transition-all"
+                            >
+                              -
+                            </button>
+                            <span className="flex-1 text-center text-xl font-black">{distributedSecondFloorBathrooms}</span>
+                            <button
+                              type="button"
+                              onClick={() => setFirstFloorBathrooms((value) => Math.max(1, value - 1))}
+                              disabled={distributedSecondFloorBathrooms >= bathrooms - 1}
+                              className="w-9 h-9 rounded-xl bg-white/5 text-slate-400 font-black disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 transition-all"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-8 border-t border-white/10 space-y-4">
                   <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
                     <span>Base ({meters} m²)</span>
                     <span>{formatPrice(basePrice)}</span>
@@ -329,7 +436,10 @@ Estoy interesado en recibir más información.`;
                   <div className="pt-4 flex flex-col gap-2">
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Precio Total Estimado</span>
                     <span className="text-5xl md:text-6xl font-black text-brand tracking-tighter">{formatPrice(totalPrice)}</span>
-                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">COP · Precio referencial, sujeto a visita técnica</span>
+                    <div className="mt-2 border-l border-brand/40 pl-4 text-xs font-semibold text-slate-400 leading-relaxed">
+                      <span className="block">Precio estimado referencial.</span>
+                      <span className="block text-slate-500">El valor final puede variar según visita técnica y condiciones del proyecto.</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -791,71 +901,6 @@ const models = [
               />
               <div className="absolute inset-0 ring-1 ring-black/5"></div>
               <div className="absolute inset-0 bg-gradient-to-br from-black/0 via-black/0 to-black/5 pointer-events-none"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Materiales Disponibles */}
-      <section className="py-24 bg-[#141414] text-white">
-        <div className="container mx-auto px-6">
-          <div className="mb-16">
-            <span className="text-brand font-black uppercase tracking-[0.3em] text-xs mb-4 block">Materiales Disponibles</span>
-            <h2 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter leading-none">
-              CONCRETO O ACERO. <br />
-              <span className="text-brand">TÚ ELIGES.</span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white/5 border border-white/10 rounded-3xl p-10 hover:border-brand/30 transition-all">
-              <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-8">
-                <Home size={24} className="text-brand" />
-              </div>
-              <h3 className="text-2xl font-black uppercase tracking-tight mb-4">CONCRETO PREFABRICADO</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-8">
-                Módulos de concreto de 3.5 cm de espesor con resistencia de 2500 a 3000 PSI. Mayor inercia térmica y aislamiento acústico.
-              </p>
-              <ul className="space-y-4">
-                {[
-                  'Módulos de 3.5 cm — 2500 a 3000 PSI',
-                  'Precisión geométrica garantizada en fábrica',
-                  'Estructura auto-portante sismo-resistente',
-                  'Placa flotante de concreto armado 8-10 cm',
-                  'Malla eléctrica soldada incluida',
-                  'Paredes más pesadas que cubierta (NSR-10)'
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-xs font-bold text-slate-300 uppercase tracking-widest">
-                    <CheckCircle2 size={14} className="text-brand mt-0.5" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-white/5 border border-white/10 rounded-3xl p-10 hover:border-brand/30 transition-all">
-              <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-8">
-                <Zap size={24} className="text-brand" />
-              </div>
-              <h3 className="text-2xl font-black uppercase tracking-tight mb-4">ACERO GALVANIZADO</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-8">
-                Perfiles de lámina de acero galvanizado calibre 22. Alta resistencia a la corrosión, estructura liviana y de rápido ensamble.
-              </p>
-              <ul className="space-y-4">
-                {[
-                  'Lámina galvanizada calibre 22',
-                  'Resistencia a corrosión garantizada',
-                  'Conecta y confina módulos de concreto',
-                  'Marcos de puerta calibre 22 anticorrosivo',
-                  'Ventanas metálicas Cold Rolled anticorrosivo',
-                  'Estructura liviana — traslado fácil'
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-xs font-bold text-slate-300 uppercase tracking-widest">
-                    <CheckCircle2 size={14} className="text-brand mt-0.5" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
         </div>

@@ -7,6 +7,11 @@ const rateMap = new Map<string, { count: number; windowStart: number }>();
 const sanitize = (value: string) =>
   value.replace(/<[^>]*>?/gm, "").replace(/[\u0000-\u001F\u007F]/g, "").trim();
 
+const safeNumber = (value: unknown) => {
+  const numberValue = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(numberValue) ? numberValue : "";
+};
+
 const isValidLead = (data: { name: string; whatsapp: string; message?: string }) => {
   const name = sanitize(data.name || "");
   const whatsapp = sanitize(data.whatsapp || "");
@@ -63,21 +68,50 @@ export default async function handler(req: any, res: any) {
     email: sanitize(email || ""),
     city: sanitize(city || ""),
     message: sanitize(message || ""),
-    m2,
-    floors,
-    rooms,
-    bathrooms,
-    material,
-    price,
+    m2: safeNumber(m2),
+    floors: safeNumber(floors),
+    rooms: safeNumber(rooms),
+    bathrooms: safeNumber(bathrooms),
+    material: sanitize(material || ""),
+    price: safeNumber(price),
   };
 
   try {
-    await fetch(webhookUrl, {
+    console.info("Webhook payload summary", {
+      name: Boolean(payload.name),
+      whatsappLast4: payload.whatsapp.slice(-4),
+      email: Boolean(payload.email),
+      city: Boolean(payload.city),
+      m2: payload.m2,
+      floors: payload.floors,
+      rooms: payload.rooms,
+      bathrooms: payload.bathrooms,
+      material: payload.material,
+      price: payload.price,
+    });
+
+    const webhookResponse = await fetch(webhookUrl, {
       method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${webhookToken}`,
+        "X-Webhook-Token": webhookToken,
+      },
       body: JSON.stringify(payload),
     });
+    const webhookText = await webhookResponse.text();
+    console.info("Webhook response", {
+      status: webhookResponse.status,
+      statusText: webhookResponse.statusText,
+      ok: webhookResponse.ok,
+      body: webhookText.slice(0, 300),
+    });
+
+    if (!webhookResponse.ok) {
+      return json(res, 502, { success: false, message: "Webhook returned an error." });
+    }
   } catch (err) {
+    console.error("Webhook request failed", err instanceof Error ? err.message : err);
     return json(res, 500, { success: false, message: "Webhook request failed." });
   }
 
