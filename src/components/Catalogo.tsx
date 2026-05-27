@@ -53,7 +53,7 @@ const Catalogo = ({
               <span className="text-brand">CADA FAMILIA.</span>
             </h2>
             <p className="text-slate-400 text-lg">
-              Desde 36 m² hasta 100 m². Concreto prefabricado o acero galvanizado. Medidas estándar o a tu gusto. Todos los modelos certificados NSR-10.
+              Desde 36 m² hasta 100 m². Concreto prefabricado o bloquelón. Medidas estándar o a tu gusto. Todos los modelos certificados NSR-10.
             </p>
             <div className="flex flex-wrap gap-4 mt-8">
               <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-full flex items-center gap-2">

@@ -438,7 +438,7 @@ Estoy interesado en recibir más información.`;
                     <span className="text-5xl md:text-6xl font-black text-brand tracking-tighter">{formatPrice(totalPrice)}</span>
                     <div className="mt-2 border-l border-brand/40 pl-4 text-xs font-semibold text-slate-400 leading-relaxed">
                       <span className="block">Precio estimado referencial.</span>
-                      <span className="block text-slate-500">El valor final puede variar según visita técnica y condiciones del proyecto.</span>
+                      <span className="block text-brand">El valor final puede variar según visita técnica y condiciones del proyecto.</span>
                     </div>
                   </div>
                 </div>
