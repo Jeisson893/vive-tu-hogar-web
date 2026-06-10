@@ -79,15 +79,21 @@ export default async function handler(req: any, res: any) {
   try {
     console.info("Webhook payload summary", {
       name: Boolean(payload.name),
-      whatsappLast4: payload.whatsapp.slice(-4),
+      nameLength: payload.name.length,
+      whatsappLength: payload.whatsapp.length,
       email: Boolean(payload.email),
+      emailLength: payload.email.length,
       city: Boolean(payload.city),
-      m2: payload.m2,
-      floors: payload.floors,
-      rooms: payload.rooms,
-      bathrooms: payload.bathrooms,
-      material: payload.material,
-      price: payload.price,
+      cityLength: payload.city.length,
+      message: Boolean(payload.message),
+      messageLength: payload.message.length,
+      m2: payload.m2 !== "",
+      floors: payload.floors !== "",
+      rooms: payload.rooms !== "",
+      bathrooms: payload.bathrooms !== "",
+      material: Boolean(payload.material),
+      materialLength: payload.material.length,
+      price: payload.price !== "",
     });
 
     const webhookResponse = await fetch(webhookUrl, {
@@ -102,16 +108,17 @@ export default async function handler(req: any, res: any) {
     const webhookText = await webhookResponse.text();
     console.info("Webhook response", {
       status: webhookResponse.status,
-      statusText: webhookResponse.statusText,
       ok: webhookResponse.ok,
-      body: webhookText.slice(0, 300),
+      bodyLength: webhookText.length,
     });
 
     if (!webhookResponse.ok) {
       return json(res, 502, { success: false, message: "Webhook returned an error." });
     }
   } catch (err) {
-    console.error("Webhook request failed", err instanceof Error ? err.message : err);
+    console.error("Webhook request failed", {
+      errorType: err instanceof Error ? err.name : typeof err,
+    });
     return json(res, 500, { success: false, message: "Webhook request failed." });
   }
 
